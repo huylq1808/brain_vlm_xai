@@ -1,0 +1,19 @@
+# Local planning documents
+/blueprint*
+/task*
+/plan*
+
+# Local datasets
+/dataset*/
+
+# Notebook and Python temporary files
+.ipynb_checkpoints/
+__pycache__/
+*.py[cod]
+
+# Local environments and secrets
+.venv/
+venv/
+.env
+.env.*
+!.env.example
