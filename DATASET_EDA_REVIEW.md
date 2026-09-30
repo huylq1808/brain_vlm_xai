@@ -1,9 +1,5 @@
 # Dataset EDA review: five datasets
 
-**Role:** Dataset observations and source references. See [blueprint.md](blueprint.md) for the data contract, [plan.md](plan.md) for the roadmap, and [task.md](task.md) for upcoming work. Notebook observations and local file checks have different coverage; neither establishes complete data validity.
-
-**Local availability audit, 2026-09-29:** This checkout contains extracted CT-ICH (75 CT volumes, 75 matching masks) and ISLES'26 raw training images (1,453 T1w filenames and 1,453 lesion-mask filenames). RSNA-IHD, SLAKE and MR-RATE images are not present in the workspace; their notebook summaries are prior EDA, not a ready local loader source. For CT-ICH, all 75 scan/mask filename pairs match, each NIfTI header pair has matching dimensions, spacing, qform and sform fields, and each patient's one-based slice-label sequence matches its image depth. These checks do **not** replace visual overlay QC or intensity validation. The first baseline can be a CT-ICH pilot; if it trains on CT-ICH, its test fold must be called internal, not external.
-
 **Concept:** [Introduction to Intracranial Haemorrhage](https://youtu.be/Kb_wzb7-rvE?si=i5SrPgfKGWdzl5q4)
 
 ## Comparison at a glance

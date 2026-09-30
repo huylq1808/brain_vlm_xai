@@ -1,8 +1,4 @@
-# Brain imaging model landscape — September 2026
-
-**Role:** Model and literature reference. The architecture belongs in [blueprint.md](blueprint.md), the delivery roadmap in [plan.md](plan.md), and upcoming actions in [task.md](task.md). Models below are candidates for their respective tasks, not a list of experiments that must all be run.
-
-This is a **research shortlist**, not a universal SOTA leaderboard. The five notebook datasets and six additional image–text datasets in [DATASET_EDA_REVIEW.md](DATASET_EDA_REVIEW.md) support different tasks, labels, splits, and metrics. A Dice score, AUROC, report score, and VQA accuracy cannot be put on one performance axis. “Recent” means work available by **28 September 2026**. Links below favor original papers, model cards, challenge organizers, and author repositories.
+# Brain imaging model landscape 
 
 ## How the models are ranked
 
