@@ -17,3 +17,14 @@ venv/
 .env
 .env.*
 !.env.example
+
+# local archive folder
+/archive/
+/docs/implementation/
+/research_proposal/
+
+
+# Reproducible prototype outputs and local approved model weights
+/outputs/
+/checkpoints/
+/vendor/
