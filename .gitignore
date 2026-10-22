@@ -12,7 +12,7 @@ __pycache__/
 *.py[cod]
 
 # Local environments and secrets
-.venv/
+.venv*/
 venv/
 .env
 .env.*
@@ -22,9 +22,22 @@ venv/
 /archive/
 /docs/implementation/
 /research_proposal/
+/releases/baseline_01/snapshot.json
 
 
 # Reproducible prototype outputs and local approved model weights
 /outputs/
 /checkpoints/
+/models/
 /vendor/
+
+# MRI, downloaded checkpoints and local sample payloads stay outside Git.
+*.nii
+*.nii.gz
+*.dcm
+*.pth
+*.pt
+*.safetensors
+/samples/*.zip
+/samples/sample_*/
+.pytest_cache/

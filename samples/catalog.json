@@ -1,0 +1,59 @@
+{
+  "version": "baseline_01_sample_registry",
+  "payloads_in_git": false,
+  "local_directory": "outputs/samples/baseline_demo_v1",
+  "colab_directory": "MyDrive/research/brain_vlm_xai/experiment",
+  "scope": "Four MEN development cases with pathology; no verified healthy controls. Source/controlled/cached-generated drafts are distinct origins.",
+  "samples": [
+    {
+      "sample_id": "sample_001",
+      "study_id": "BraTS-MEN-00034-000",
+      "variants": [
+        "source",
+        "controlled_low",
+        "controlled_intermediate",
+        "generated08"
+      ],
+      "file": "sample_001.zip",
+      "bytes": 18345185,
+      "sha256": "c1e7eb45911e9c767822944603f55c80d6b296fc9ac4d33676d78d9c55ac2c05"
+    },
+    {
+      "sample_id": "sample_002",
+      "study_id": "BraTS-MEN-01272-000",
+      "variants": [
+        "source",
+        "controlled_intermediate",
+        "controlled_high",
+        "generated08"
+      ],
+      "file": "sample_002.zip",
+      "bytes": 22217129,
+      "sha256": "4f27619d405c1c36923b9a603b454a6860ab8cd67ba3851f19d823cb0b588c4b"
+    },
+    {
+      "sample_id": "sample_003",
+      "study_id": "BraTS-MEN-00854-000",
+      "variants": [
+        "source",
+        "controlled_low",
+        "generated08"
+      ],
+      "file": "sample_003.zip",
+      "bytes": 20386770,
+      "sha256": "10a7c5addeffe06ba7bf29c74ec26bbc8c3fbc3a5bd0bb303118a8e8f652d63a"
+    },
+    {
+      "sample_id": "sample_004",
+      "study_id": "BraTS-MEN-00425-000",
+      "variants": [
+        "source",
+        "controlled_low",
+        "controlled_high"
+      ],
+      "file": "sample_004.zip",
+      "bytes": 20438730,
+      "sha256": "e11551fbde9254215d8c166efefc467294c7e924179d941cf8fac9a6f90a5cd1"
+    }
+  ]
+}

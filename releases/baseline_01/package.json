@@ -1,0 +1,7 @@
+{
+  "file": "brain_mri_baseline_clean_v1.zip",
+  "sha256": "1ec15cbbf2cf7f367acb1ff9d1e8bf7283f9bd10a5db6a16457eecbb4cd8834e",
+  "bytes": 120067,
+  "package_modules": 47,
+  "weights_included": false
+}
