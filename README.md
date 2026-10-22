@@ -1,6 +1,6 @@
 # Brain MRI VLM baseline
 
-Baseline nhận **MRI study + draft Findings**, dùng frozen MedGemma1.5 để quan sát ảnh, so sánh thuộc tính T2 trong phạm vi hỗ trợ, rồi xuất Findings đã chỉnh cùng quyết định và evidence IDs.
+This baseline takes an **MRI study and draft Findings**, uses frozen MedGemma1.5 to inspect the images, checks a supported T2 signal attribute, and returns revised Findings with decisions and evidence IDs.
 
 ```text
 Aligned NIfTI volumes + supplied Findings
@@ -10,51 +10,51 @@ Aligned NIfTI volumes + supplied Findings
  → revised Findings + decisions + unresolved + presenter
 ```
 
-Notebook không sinh draft mới. Một observation có thể dùng chung cho nhiều draft variants khi inputs/neutral target giống nhau. Baseline chỉ sửa primary-finding T2 direction; phần ngoài phạm vi được giữ và ghi unassessed. Chạy thành công hoặc đúng schema không chứng minh kết quả đúng y khoa.
+The notebook does not generate a new draft. An image observation can be shared across draft variants when the image inputs and neutral target match. Editing is limited to the primary finding's T2 signal direction; text outside this scope is preserved and recorded as unassessed. Successful execution or schema validation does not establish clinical correctness.
 
-## Các file để chạy
+## Getting started
 
-- [Notebook duy nhất](notebooks/Brain_MRI_Baseline_Colab.ipynb).
-- [Source package](releases/baseline_01/brain_mri_baseline_clean_v1.zip) và [hash/metadata](releases/baseline_01/package.json).
-- [Sample catalog](samples/catalog.json): tên sample, draft variants, kích thước và SHA256.
+- [Colab notebook](notebooks/Brain_MRI_Baseline_Colab.ipynb).
+- [Source package](releases/baseline_01/brain_mri_baseline_clean_v1.zip) and [package metadata and checksum](releases/baseline_01/package.json).
+- [Sample catalog](samples/catalog.json): sample names, draft variants, file sizes, and SHA256 checksums.
 
-Repository chứa code, tests và hướng dẫn. MRI/sample ZIP payloads, model weights, tokens và raw runs không được phân phối trong Git. Người chạy chuẩn bị sample từ nguồn được phép sử dụng. Code và model/dataset có điều kiện sử dụng riêng của từng nguồn.
+The repository contains code, tests, and operating instructions. MRI volumes, sample ZIP payloads, model weights, access tokens, and raw runs are not distributed through Git. Prepare the sample data from sources you are authorized to use. The code, model weights, and datasets are subject to their respective licenses and terms.
 
 ## Input
 
-- Bốn volume `.nii`/`.nii.gz`: T1, T1c, T2 và FLAIR, mỗi volume3D.
-- Các sequence phải aligned, cùng grid/affine sau canonicalization. Code kiểm tra nhưng không tự registration hoặc chuyển DICOM.
-- Draft là văn bản Findings. `source` là authored report; `controlled_*` chứa thay đổi nhân tạo; `generated08` nếu có là draft đã cache, không sinh mới trong lần chạy này.
-- Evaluation labels không được đưa vào prompt hoặc chọn ảnh cho inference.
+- Four 3D volumes in `.nii` or `.nii.gz` format: T1, post-contrast T1 (`t1c`), T2, and FLAIR.
+- The sequences must be aligned, with matching grids and affine transforms after canonicalization. The code checks these conditions but does not perform registration or DICOM conversion.
+- Draft Findings are supplied as text. `source` is an authored report; `controlled_*` variants contain artificial changes; `generated08`, where available, is a cached generated draft, not a new generation in the current run.
+- Evaluation labels are not used in inference prompts or image selection.
 
-## Chạy trên Google Colab
+## Running on Google Colab
 
-1. Upload notebook lên Colab, chọn GPU có khoảng12GiB VRAM trở lên cho profile hiện tại. Tài nguyên thực còn phụ thuộc runtime/input.
-2. Upload source ZIP và một sample ZIP vào Drive:
+1. Upload the notebook to Colab and select a GPU runtime. The current profile targets GPUs with approximately 12 GiB of VRAM or more; actual memory requirements depend on the runtime and inputs.
+2. Upload the source ZIP and one sample ZIP to this Google Drive folder:
 
    `MyDrive/research/brain_vlm_xai/experiment/`
 
-3. Reuse weights ở:
+3. Reuse the model weights at:
 
    `MyDrive/research/brain_vlm_xai/assessor_models/medgemma-1.5-4b-it`
 
-   Model: `google/medgemma-1.5-4b-it`, revision `91850547d9f0b2fdd21aa7c5f4f3d1a8a52c243b`. `DOWNLOAD_MISSING=True` tải phần thiếu. Model gated cần quyền truy cập; đặt token trong Colab Secrets `HF_TOKEN`, không ghi token vào code.
-4. Cell1 đặt `MODE="run"`, `SAMPLE_NAME="sample_001"`, `DRAFT_VARIANTS=["source","controlled_low"]`, `RESUME_RUN=""`. Chạy code cells1→6.
+   Model: `google/medgemma-1.5-4b-it`, revision `91850547d9f0b2fdd21aa7c5f4f3d1a8a52c243b`. Set `DOWNLOAD_MISSING=True` to download missing files. Access to the gated model must be authorized. Store your token in Colab Secrets as `HF_TOKEN`; do not put it in the notebook source.
+4. In code cell 1, set `MODE="run"`, `SAMPLE_NAME="sample_001"`, `DRAFT_VARIANTS=["source","controlled_low"]`, and `RESUME_RUN=""`. Run code cells 1 through 6.
 
-| Cell | Việc thực hiện | Load model? |
+| Code cell | Action | Loads the model? |
 |---|---|---|
-| 1 | Mount Drive, cấu hình run | Không |
-| 2 | Kiểm hash/extract ZIP, chuẩn bị worker environment | Không |
-| 3 | Render MRI PNGs, tách claims, tạo prompt/job | Không |
-| 4 | Load MedGemma và inference cho pending job | Có |
-| 5 | Gate/compare và exact-span editing | Không |
-| 6 | Đọc kết quả thành HTML presenter | Không |
+| 1 | Mount Drive and configure the run | No |
+| 2 | Verify checksums, extract ZIPs, and prepare the worker environment | No |
+| 3 | Render MRI PNGs, extract claims, and prepare the prompt and job | No |
+| 4 | Load MedGemma and run inference for pending jobs | Yes, when needed |
+| 5 | Apply acceptance checks, compare observations, and edit exact text spans | No |
+| 6 | Display the saved results in an HTML presenter | No |
 
-Source ZIP SHA256: `1ec15cbbf2cf7f367acb1ff9d1e8bf7283f9bd10a5db6a16457eecbb4cd8834e`. Dùng notebook và ZIP cùng phiên bản. Source/config/input đổi thì tạo run mới; không resume một run bằng source khác. Cell4 reuse cache đã kiểm hợp lệ; không có synthetic model fallback hoặc tự retry nhiều lần.
+Source ZIP SHA256: `1ec15cbbf2cf7f367acb1ff9d1e8bf7283f9bd10a5db6a16457eecbb4cd8834e`. Use the notebook and source ZIP from the same version. Create a new run when the source, configuration, or inputs change. Code cell 4 reuses validated cached calls when available; there is no synthetic model fallback or repeated automatic retry.
 
 ## Samples
 
-Chuẩn bị sample ZIP có hash khớp catalog. Vị trí local mặc định: `outputs/samples/baseline_demo_v1/`. Sau đó upload ZIP cần dùng vào Drive như trên.
+Use sample ZIPs whose checksums match the catalog. Their default local location is `outputs/samples/baseline_demo_v1/`. Upload the selected ZIP to the Drive folder listed above.
 
 | Sample | Draft variants |
 |---|---|
@@ -63,49 +63,62 @@ Chuẩn bị sample ZIP có hash khớp catalog. Vị trí local mặc định: 
 | sample_003 | source, controlled_low, generated08 |
 | sample_004 | source, controlled_low, controlled_high |
 
-Đây là bốn MEN development cases có bệnh, không phải healthy controls hoặc clinical benchmark. Đổi sample cần chọn variants thực sự có trong catalog và đặt `RESUME_RUN=""`.
+These are four meningioma (MEN) development cases with pathology, not healthy controls or a clinical benchmark. When changing samples, select draft variants listed for that sample and set `RESUME_RUN=""`.
 
-## Sau disconnect
+## After a runtime disconnect
 
-- **Đọc lại:** `MODE="read"`, đặt `READ_RUN` là folder run đã lưu trên Drive, chạy1→6. Cần source ZIP và raw run, không cần sample/GPU/weights. Cells3–5 bỏ qua inference và editing.
-- **Tiếp tục cùng run:** `MODE="run"`, đặt `RESUME_RUN`, giữ nguyên source/sample/variants/config. Chạy1→6; completed calls được reuse.
-- Interrupted/failed calls có records/logs để kiểm tra, không tự retry đến khi có output mong muốn.
+- **Read saved results:** Set `MODE="read"` and point `READ_RUN` to the saved run folder on Drive. Run code cells 1 through 6. This requires the source ZIP and raw run, but no sample ZIP, GPU, or weights. Code cells 3–5 skip inference and editing.
+- **Resume the same run:** Set `MODE="run"` and `RESUME_RUN`, keeping the source, sample, draft variants, and configuration unchanged. Run code cells 1 through 6; completed calls are reused.
+- Interrupted or failed calls retain their records and logs for inspection. They are not automatically retried until a preferred answer appears.
 
-## Đọc output theo luồng
+## Following the outputs
 
-| Artifact | Nội dung |
+| Artifact | Contents |
 |---|---|
-| config.json, identity.json, source_snapshot.zip | Config và source/input identity |
-| images/, evidence.json | PNG thực vào model; evidence ID, sequence, slice, normalization |
-| requests/, jobs.json, prepared.json | Draft/claims/editable spans, neutral task, prompt/schema |
-| model_load.json, model_config.json | Model revision, weight inventory, runtime profile/resources |
-| observations/ | Raw response, stop/schema/contract status, actual tensor metadata/resources |
-| gates/ | Raw/effective observation và lý do accept/defer |
+| config.json, identity.json, source_snapshot.zip | Configuration and source/input identity |
+| images/, evidence.json | Actual model-input PNGs; evidence IDs, sequences, slices, and normalization |
+| requests/, jobs.json, prepared.json | Drafts, claims, editable spans, neutral task, prompt, and schema |
+| model_load.json, model_config.json | Model revision, weight inventory, runtime profile, and resources |
+| observations/ | Raw responses, stop/schema/contract status, actual tensor metadata, and resources |
+| gates/ | Raw and effective observations, with reasons for accepting or deferring |
 | studies/ | Assessment, policy, result, decisions.csv, revised_findings.txt, unresolved.json |
-| summary.json, presentation.html | Tổng hợp execution và presenter |
+| summary.json, presentation.html | Execution summary and HTML presenter |
 
-Cell6 lưu review ngoài raw run. Xem ảnh thực trước, rồi draft/claim, raw observation, gate và phần text đã đổi. Evidence ID đúng chưa chứng minh lesion/reference tissue đúng. Flag/unassessed không có nghĩa câu đã được xác nhận đúng.
+Code cell 6 saves its review outside the raw run folder. Inspect the actual images first, then the draft and claim, raw observation, acceptance checks, and text changes. A valid evidence ID does not establish correct lesion or reference-tissue identification. Flagged or unassessed text has not been confirmed correct.
 
-RAM/DRAM là system memory; VRAM là GPU memory. Weight bytes không bằng inference peak; xem model-load/observation resource records của từng run. Sampled memory peaks là lower bounds.
+RAM/DRAM refers to system memory; VRAM refers to GPU memory. Weight size is not the same as peak inference memory. Consult the model-load and observation resource records for each run. Sampled memory peaks are lower bounds.
 
-Để gửi kết quả, ZIP toàn folder run gồm PNGs, observations, model metadata và study outputs; chỉ HTML không đủ tái kiểm tra.
+For a review of a run, provide the complete run folder as a ZIP, including PNGs, observations, model metadata, and study outputs. The HTML file alone is insufficient to recheck the results.
 
-## Chạy công cụ local
+## Local tools
 
-Cài preparation dependencies trong `src/requirements.txt` và đặt `PYTHONPATH` trỏ tới `src`. Trong PowerShell:
+Run local commands from the repository root. Install the preparation dependencies and set `PYTHONPATH` to `src`.
+
+PowerShell:
 
 ```powershell
+python -m pip install -r src/requirements.txt
 $env:PYTHONPATH = (Resolve-Path src).Path
 python -m brain_vlm present RUN --output NEW_REVIEW_FOLDER
 ```
 
-Offline evaluation, labels chỉ vào sau inference:
+Bash:
+
+```bash
+python -m pip install -r src/requirements.txt
+export PYTHONPATH="$PWD/src"
+python -m brain_vlm present RUN --output NEW_REVIEW_FOLDER
+```
+
+Replace `RUN` with a saved run folder and `NEW_REVIEW_FOLDER` with a separate output directory. The reader does not load model weights.
+
+Offline evaluation uses labels only after inference:
 
 ```text
 python -m brain_vlm evaluate RUN --output NEW_EVALUATION_FOLDER --labels LABELS.json
 ```
 
-Reader/evaluation output phải nằm ngoài raw run. Reference-relative metrics không tự là clinical accuracy.
+Reader and evaluation outputs must be outside the raw run folder. Agreement with a reference does not by itself establish clinical accuracy.
 
 ## Code
 
@@ -115,7 +128,7 @@ notebooks/Brain_MRI_Baseline_Colab.ipynb
 src/brain_vlm/
   baseline/pretrained.py       prepare / infer / finalize
   baseline/claims.py           bounded claim mapping
-  baseline/vlm/loader.py       MedGemma loading và input tracing
+  baseline/vlm/loader.py       MedGemma loading and input tracing
   baseline/vlm/models.py       snapshot registry / encoder export
   prima/                      reusable PRIMA utilities
   refinement/                 model adapter, contracts, gates, editor, resources
@@ -125,31 +138,31 @@ src/tests/
 src/requirements.txt
 tools/build_colab_package.py
 samples/catalog.json
-releases/baseline_01/          source-only ZIP và package metadata
+releases/baseline_01/          source-only ZIP and package metadata
 ```
 
-PRIMA không được load trong notebook baseline này. Optional encoder extraction vẫn có trong PRIMA environment riêng với dependencies tương thích, không dùng chung MedGemma worker:
+The baseline notebook does not load PRIMA. Optional PRIMA encoder extraction is available in a separate environment with compatible dependencies; do not use the MedGemma worker for this step:
 
 ```text
 python -m brain_vlm extract-prima --model-root MODEL_ROOT --prima-root PRIMA_SOURCE --compact-root COMPACT_ROOT --no-download --record EXPORT_RECORD.json
 ```
 
-`MODEL_ROOT` chứa `test/trained_models`; `COMPACT_ROOT` mặc định là `MODEL_ROOT/prima_encoders_v1`. Reuse bundle hợp lệ; bỏ `--no-download` để tải phần thiếu. Export record đặt ngoài weights folder. Đây là encoder extraction, không student training.
+`MODEL_ROOT` contains `test/trained_models`; `COMPACT_ROOT` defaults to `MODEL_ROOT/prima_encoders_v1` when omitted. A valid existing bundle is reused. Remove `--no-download` to allow missing files to be downloaded. Save the export record outside the weights directory. This is encoder extraction, not student-model training.
 
-## Build và kiểm tra
+## Building and testing
 
-Đóng gói source, cập nhật hash pin trong notebook/README và package metadata:
+Build the source ZIP and update its checksum in the notebook, README, and package metadata:
 
 ```text
 python tools/build_colab_package.py
 ```
 
-Không load model hoặc đọc MRI khi build. Cùng source bytes cho cùng ZIP hash.
+Building does not load models or read MRI data. Identical source bytes produce the same ZIP checksum.
 
-Regression tests cần preparation dependencies, PyTorch và `PYTHONPATH=src`:
+Regression tests require the preparation dependencies, PyTorch, and `PYTHONPATH` pointing to `src`:
 
 ```text
 python -m unittest discover -s src/tests -v
 ```
 
-Một số integration/reader tests cần samples/raw runs local và sẽ skip nếu thiếu. Software tests không đánh giá độ chính xác y khoa. Notebook được lưu không có cell outputs hoặc embedded patient images.
+Some integration and reader tests require local samples or raw runs and are skipped when those fixtures are unavailable. Software tests do not measure clinical correctness. The notebook is stored without cell outputs or embedded patient images.
